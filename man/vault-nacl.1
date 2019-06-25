@@ -1,0 +1,78 @@
+.\" generated with Ronn-NG/v0.8.0
+.\" http://github.com/apjanke/ronn-ng/tree/0.8.0
+.TH "VAULT\-NACL" "1" "July 2019" "" ""
+.SH "NAME"
+\fBvault\-nacl\fR \- A symmetric encrypted vault using tweetnacl elliptic curves
+.SH "SYNOPSIS"
+.nf
+vault\-nacl [encrypt|decrypt|rekey] [options] [<vaultfile>]
+.fi
+.SH "DESCRIPTION"
+A symmetric encrypted vault using tweetnacl \fI\%https://npmjs\.com/package/tweetnacl\fR elliptic curves
+.P
+Allows to symmetrically encrypt dedicated values in a configuration file using one password\.
+.P
+Uses \fBVAULT_NACL(\|\.\|\.\|\.)\fR markers with Base64 encrypted secret inside the vault to identify encrypted values for decryption\.
+.P
+New values attributed with \fBVAULT_NACL(\|\.\|\.\|\.)VAULT_NACL\fR are used for later encryption\.
+.SH "ACTIONS"
+.TP
+\fBdecrypt\fR
+Decrypt one or more files
+.TP
+\fBencrypt\fR
+Encrypt one or more files
+.TP
+\fBrekey\fR
+Re\-Encrypt one or more files\. Requires option \fB\-\-new\-password\fR or \fB\-\-new\-password\-file\fR\.
+.SH "OPTIONS"
+.IP "\[ci]" 4
+\fB\-h\fR, \fB\-\-help\fR: Display this help and exit\.
+.IP "\[ci]" 4
+\fB\-\-version\fR: Output version information and exit\.
+.IP "\[ci]" 4
+\fB\-p\fR, \fB\-\-password\fR \fB<password>\fR: Password to encrypt/ decrypt the vault
+.IP "\[ci]" 4
+\fB\-\-password\-file\fR \fB<file>\fR: Read password from first line of file \fB<file>\fR
+.IP "\[ci]" 4
+\fB\-\-new\-password\fR \fB<password>\fR: Action \fBrekey\fR only\. New password to encrypt the vault
+.IP "\[ci]" 4
+\fB\-\-new\-password\-file\fR \fB<file>\fR: Action \fBrekey\fR only\. Read new password from first line of file \fB<file>\fR
+.IP "\[ci]" 4
+\fB\-\-digest\fR \fB<digest>\fR: Digest used for key derivation\. One of \'sha256\', \'sha384\', \'sha512\', \'ripemd\', \'whirlpool\'\. \'sha256\' is default\.
+.IP "\[ci]" 4
+\fB\-\-iterations\fR \fB<number>\fR Iterations used for key derivation\. Default is \'10000\'\.
+.IP "" 0
+.SH "EXAMPLES"
+Encrypt vaultfile \'config\.json\' (You\'ll get prompted for the password):
+.IP "" 4
+.nf
+echo {"secret":"VAULT_NACL(my secret hidden value)VAULT_NACL"} > config\.json
+vault\-nacl encrypt config\.json
+
+cat config\.json
+{"secret":"VAULT_NACL(AQAQJwAA+XJjGfdtC8jCt7xsWoPBCz2p/qs5MXpzmsqV5jFGCm6xfZgKcADzu3glf1z/5KxKaFFJbtCvX5rAqh/jq3UhRsMHHirldw==)"}
+.fi
+.IP "" 0
+.P
+Decrypt vaultfile \'vault1\.js\':
+.IP "" 4
+.nf
+vault\-nacl decrypt \-p "my pass" vault1\.js
+.fi
+.IP "" 0
+.P
+Re\-encrypt with digest \'sha512\' with 25000 iterations:
+.IP "" 4
+.nf
+vault\-nacl rekey \-\-digest sha512 \-\-iterations 25000 vault1\.js
+.fi
+.IP "" 0
+.SH "INSTALLATION"
+.nf
+npm i \-g vault\-nacl
+.fi
+.SH "COPYRIGHT"
+Copyright (c) 2019\- commenthol \- MIT License
+.SH "REPORTING BUGS"
+vault\-nacl repository \fI\%https://github\.com/commenthol/vault\-nacl/issues\fR

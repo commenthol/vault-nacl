@@ -1,0 +1,81 @@
+VAULT-NACL(1)                                                    VAULT-NACL(1)
+
+NAME
+       vault-nacl  -  A  symmetric  encrypted  vault  using tweetnacl elliptic
+       curves
+
+SYNOPSIS
+       vault-nacl [encrypt|decrypt|rekey] [options] [<vaultfile>]
+
+DESCRIPTION
+       A      symmetric      encrypted       vault       using       tweetnacl
+       https://npmjs.com/package/tweetnacl elliptic curves
+
+       Allows  to  symmetrically  encrypt  dedicated values in a configuration
+       file using one password.
+
+       Uses VAULT_NACL(...) markers with Base64 encrypted  secret  inside  the
+       vault to identify encrypted values for decryption.
+
+       New values attributed with VAULT_NACL(...)VAULT_NACL are used for later
+       encryption.
+
+ACTIONS
+       decrypt
+              Decrypt one or more files
+
+       encrypt
+              Encrypt one or more files
+
+       rekey  Re-Encrypt one or more files. Requires option --new-password  or
+              --new-password-file.
+
+OPTIONS
+       ○   -h, --help: Display this help and exit.
+
+       ○   --version: Output version information and exit.
+
+       ○   -p, --password <password>: Password to encrypt/ decrypt the vault
+
+       ○   --password-file  <file>:  Read  password  from  first  line of file
+           <file>
+
+       ○   --new-password <password>: Action rekey only. New password  to  en‐
+           crypt the vault
+
+       ○   --new-password-file  <file>:  Action  rekey only. Read new password
+           from first line of file <file>
+
+       ○   --digest <digest>: Digest used for key derivation. One of ´sha256´,
+           ´sha384´, ´sha512´, ´ripemd´, ´whirlpool´. ´sha256´ is default.
+
+       ○   --iterations  <number>  Iterations used for key derivation. Default
+           is ´10000´.
+
+EXAMPLES
+       Encrypt vaultfile ´config.json´ (You´ll get prompted for the password):
+
+           echo {"secret":"VAULT_NACL(my secret hidden value)VAULT_NACL"} > config.json
+           vault-nacl encrypt config.json
+
+           cat config.json
+           {"secret":"VAULT_NACL(AQAQJwAA+XJjGfdtC8jCt7xsWoPBCz2p/qs5MXpzmsqV5jFGCm6xfZgKcADzu3glf1z/5KxKaFFJbtCvX5rAqh/jq3UhRsMHHirldw==)"}
+
+       Decrypt vaultfile ´vault1.js´:
+
+           vault-nacl decrypt -p "my pass" vault1.js
+
+       Re-encrypt with digest ´sha512´ with 25000 iterations:
+
+           vault-nacl rekey --digest sha512 --iterations 25000 vault1.js
+
+INSTALLATION
+       npm i -g vault-nacl
+
+COPYRIGHT
+       Copyright (c) 2019- commenthol - MIT License
+
+REPORTING BUGS
+       vault-nacl repository https://github.com/commenthol/vault-nacl/issues
+
+                                   July 2019                     VAULT-NACL(1)

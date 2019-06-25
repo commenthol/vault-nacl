@@ -1,0 +1,59 @@
+{
+  "name": "vault-nacl",
+  "version": "0.1.0",
+  "description": "A symmetric encrypted vault using nacl elliptic curves",
+  "keywords": [
+    "cipher",
+    "curves",
+    "elliptic",
+    "symmetric",
+    "vault"
+  ],
+  "homepage": "https://github.com/commenthol/vault-nacl",
+  "bugs": {
+    "url": "http://github.com/commenthol/vault-nacl/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/commenthol/vault-nacl.git"
+  },
+  "license": "MIT",
+  "author": "commenthol",
+  "main": "src",
+  "bin": {
+    "vault-nacl": "./bin/vault-nacl.js"
+  },
+  "man": "./man/vault-nacl.1",
+  "directories": {
+    "src": "src",
+    "test": "test"
+  },
+  "scripts": {
+    "all": "npm run test && npm run lint",
+    "test": "nyc -r text mocha",
+    "lint": "eslint --fix src test",
+    "man": "cd man && ronn -r vault-nacl.md --pipe > vault-nacl.1 && man ./vault-nacl.1 > vault-nacl.txt",
+    "readme": "markedpp --github -i README.md -o README.md",
+    "prepublishOnly": "npm run all",
+    "test:mocha": "mocha"
+  },
+  "dependencies": {
+    "chalk": "^2.4.2",
+    "enquirer": "^2.3.1",
+    "tweetnacl": "^1.0.1"
+  },
+  "devDependencies": {
+    "debug": "^4.1.1",
+    "eslint": "^6.2.2",
+    "eslint-config-standard": "^14.1.0",
+    "eslint-plugin-import": "^2.18.2",
+    "eslint-plugin-node": "^9.1.0",
+    "eslint-plugin-promise": "^4.2.1",
+    "eslint-plugin-standard": "^4.0.1",
+    "mocha": "^6.2.0",
+    "nyc": "^14.1.1"
+  },
+  "engine": {
+    "node": ">=8.0.0"
+  }
+}
