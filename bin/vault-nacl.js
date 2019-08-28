@@ -6,7 +6,7 @@ const fs = require('fs')
 const path = require('path')
 const chalk = require('chalk')
 const { prompt } = require('enquirer')
-const { EncDecSync, Vault } = require('..')
+const { EncDecSync, Vault, readPwdFileSync } = require('..')
 
 const MSG_PASSWORD = 'Vault password'
 const MSG_PASSWORD_CONFIRM = 'Confirm Vault password'
@@ -102,7 +102,6 @@ async function ask (cmd) {
 
 const readFile = (filename) => fs.readFileSync(filename, 'utf8')
 const writeFile = (filename, data) => fs.writeFileSync(filename, data, 'utf8')
-const readPwdFile = (filename) => (readFile(filename) || '').split(/[\n\r]/g)[0].trim()
 
 function version () {
   console.log('v' + require('../package.json').version)
@@ -130,11 +129,11 @@ async function main () {
     let newVault
 
     if (!cmd.password && cmd.passwordFile) {
-      cmd.password = readPwdFile(cmd.passwordFile)
+      cmd.password = readPwdFileSync(cmd.passwordFile)
       if (!cmd.password) throw new Error(ERROR_PASSWORD)
     }
     if (!cmd.newPassword && cmd.newPasswordFile) {
-      cmd.newPassword = readPwdFile(cmd.newPasswordFile)
+      cmd.newPassword = readPwdFileSync(cmd.newPasswordFile)
       const { digest, iterations } = cmd
       newVault = new Vault(cmd.newPassword, { digest, iterations })
     }

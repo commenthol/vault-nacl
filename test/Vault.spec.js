@@ -139,7 +139,7 @@ describe('vault', function () {
     })
   })
 
-  it('shall fail on bad versiob', function () {
+  it('shall fail on bad version', function () {
     const v = new Vault(password)
     return v.decrypt(vaultBadVersion)
       .then(() => {
