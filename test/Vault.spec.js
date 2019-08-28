@@ -30,7 +30,7 @@ describe('vault', function () {
         ok(false, 'shall not reach here')
       })
       .catch(err => {
-        strictEqual(err.message, 'no password')
+        strictEqual(err.message, 'No password')
       })
   })
 
@@ -43,7 +43,7 @@ describe('vault', function () {
         ok(false, 'shall not reach here')
       })
       .catch(err => {
-        strictEqual(err.message, 'no password')
+        strictEqual(err.message, 'No password')
       })
   })
 
@@ -54,7 +54,7 @@ describe('vault', function () {
         ok(false, 'shall not reach here')
       })
       .catch(err => {
-        strictEqual(err.message, 'unsupported digest')
+        strictEqual(err.message, 'Unsupported digest')
       })
   })
 
@@ -146,7 +146,7 @@ describe('vault', function () {
         ok(false, 'shall not reach here')
       })
       .catch(err => {
-        strictEqual(err.message, 'unsupported version 255')
+        strictEqual(err.message, 'Unsupported version 255')
       })
   })
 
@@ -157,7 +157,7 @@ describe('vault', function () {
         ok(false, 'shall not reach here')
       })
       .catch(err => {
-        strictEqual(err.message, 'unsupported digest')
+        strictEqual(err.message, 'Unsupported digest')
       })
   })
 
@@ -168,7 +168,7 @@ describe('vault', function () {
         ok(false, 'shall not reach here')
       })
       .catch(err => {
-        strictEqual(err.message, 'decrypt failed')
+        strictEqual(err.message, 'Decrypt failed')
       })
   })
 
@@ -179,7 +179,7 @@ describe('vault', function () {
         ok(false, 'shall not reach here')
       })
       .catch(err => {
-        strictEqual(err.message, 'decrypt failed')
+        strictEqual(err.message, 'Decrypt failed')
       })
   })
 
@@ -190,7 +190,7 @@ describe('vault', function () {
         ok(false, 'shall not reach here')
       })
       .catch(err => {
-        strictEqual(err.message, 'decrypt failed')
+        strictEqual(err.message, 'Decrypt failed')
       })
   })
 })

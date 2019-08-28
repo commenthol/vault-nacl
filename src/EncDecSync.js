@@ -12,17 +12,21 @@ class EncDecSync {
    */
   constructor (password, opts = {}) {
     this._vault = new Vault(password, opts)
+    this._keys = []
   }
 
   clear () {
+    this._keys = []
     this._vault.clear()
   }
 
   decrypt (values) {
+    this._keys = []
     return this._traverse(values)
   }
 
   encrypt (values) {
+    this._keys = []
     return this._traverse(values, { isEncMode: true })
   }
 
@@ -30,11 +34,12 @@ class EncDecSync {
    * @param {Vault|String} [newVault] - new password/vault for re-encryption
    */
   rekey (values, newVault) {
+    this._keys = []
     if (typeof newVault === 'string') {
       newVault = new Vault(newVault)
     }
     if (newVault && !(newVault instanceof Vault)) {
-      throw new Error('need instanceof Vault')
+      throw new Error('Need instanceof Vault')
     }
     return this._traverse(values, { isEncMode: true, newVault })
   }
@@ -49,14 +54,21 @@ class EncDecSync {
           Object.keys(obj).forEach((key) => {
             if (key !== '__proto__') {
               visited.push(obj)
+              this._keys.push(key)
               obj[key] = this._traverse(obj[key], { isEncMode, newVault, visited })
+              this._keys.pop()
               visited.pop(obj)
             }
           })
           return obj
         }
         case '[object Array]': {
-          return obj.map((item) => this._traverse(item, { isEncMode, newVault, visited }))
+          return obj.map((item, i) => {
+            this._keys.push(`[${i}]`)
+            const val = this._traverse(item, { isEncMode, newVault, visited })
+            this._keys.pop()
+            return val
+          })
         }
         case '[object String]': {
           return isEncMode
@@ -86,7 +98,15 @@ class EncDecSync {
   }
 
   _replace (str = '') {
-    return str.replace(RE_DECRYPT, (m, enc) => this._vault.decryptSync(enc))
+    try {
+      return str.replace(RE_DECRYPT, (m, enc) => this._vault.decryptSync(enc))
+    } catch (e) {
+      if (e.message === 'Decrypt failed' && this._keys.length) {
+        throw new Error(`Decrypt failed at "${this._keys.join('.')}"`)
+      } else {
+        throw e
+      }
+    }
   }
 }
 

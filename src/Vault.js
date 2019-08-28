@@ -47,8 +47,8 @@ class Vault {
   }
 
   _derivedKeySync ({ salt, iterations, digest }) {
-    if (!this[PASSWORD]) throw new Error('no password')
-    if (!DIGESTS.includes(digest)) throw new Error('unsupported digest')
+    if (!this[PASSWORD]) throw new Error('No password')
+    if (!DIGESTS.includes(digest)) throw new Error('Unsupported digest')
     const derivedKey = crypto.pbkdf2Sync(this[PASSWORD], salt, iterations, NONCE_LEN + KEY_LEN, digest)
     let tmp = 0
     const nonce = derivedKey.slice(tmp, tmp += NONCE_LEN)
@@ -76,7 +76,7 @@ class Vault {
     const iterations = bufferToNum(buf.slice(tmp, tmp += 4))
     const salt = buf.slice(tmp, tmp += KEY_LEN)
     const box = buf.slice(tmp)
-    if (version > VERSION) throw new Error(`unsupported version ${version}`)
+    if (version > VERSION) throw new Error(`Unsupported version ${version}`)
     // console.log(digest, iterations, version)
     return { salt, digest, iterations, box, version }
   }
@@ -92,7 +92,7 @@ class Vault {
       const msgBuffer = Buffer.from(nacl.secretbox.open(box, nonce, key))
       return msgBuffer.toString(this.inputEncoding)
     } catch (e) {
-      throw new Error('decrypt failed')
+      throw new Error('Decrypt failed')
     }
   }
 
@@ -112,8 +112,8 @@ class Vault {
   }
 
   async _derivedKey ({ salt, iterations, digest }) {
-    if (!this[PASSWORD]) throw new Error('no password')
-    if (!DIGESTS.includes(digest)) throw new Error('unsupported digest')
+    if (!this[PASSWORD]) throw new Error('No password')
+    if (!DIGESTS.includes(digest)) throw new Error('Unsupported digest')
     const derivedKey = await pbkdf2(this[PASSWORD], salt, iterations, NONCE_LEN + KEY_LEN, digest)
     let tmp = 0
     const nonce = derivedKey.slice(tmp, tmp += NONCE_LEN)

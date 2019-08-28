@@ -64,7 +64,7 @@ describe('EncDecSync', function () {
     encdec.clear()
     assert.throws(() => {
       encdec.decrypt(values())
-    }, /^Error: no password$/)
+    }, /^Error: No password$/)
   })
 
   it('should encrypt string values', function () {
@@ -115,7 +115,7 @@ describe('EncDecSync', function () {
     const encdec = new EncDecSync('wrong password')
     assert.throws(() => {
       encdec.encrypt(_values)
-    }, /^Error: decrypt failed/)
+    }, /^Error: Decrypt failed/)
   })
 
   it('re-encrypt shall fail if vault is of wrong type', function () {
@@ -125,7 +125,7 @@ describe('EncDecSync', function () {
     const encdec = new EncDecSync(password)
     assert.throws(() => {
       encdec.rekey(_values, 1234)
-    }, /^Error: need instanceof Vault$/)
+    }, /^Error: Need instanceof Vault$/)
   })
 
   describe('should re-encrypt new object value using different password', function () {
@@ -151,7 +151,7 @@ describe('EncDecSync', function () {
         encdec.decrypt(resultEnc)
         assert.ok(false, 'shall not decrypt with old password any longer')
       } catch (e) {
-        strictEqual(e.message, 'decrypt failed')
+        strictEqual(e.message, 'Decrypt failed at "val2"')
       }
     })
 
@@ -194,7 +194,7 @@ describe('EncDecSync', function () {
         encdec.decrypt(resultEnc)
         assert.ok(false, 'shall not decrypt with old password any longer')
       } catch (e) {
-        strictEqual(e.message, 'decrypt failed')
+        strictEqual(e.message, 'Decrypt failed at "val2"')
       }
     })
 
