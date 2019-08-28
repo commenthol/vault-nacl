@@ -131,14 +131,14 @@ main()
 
 _synchronous_
 
-This example uses a different digest and
+This example uses a different digest and iterations:
 
 ```js
 const { Vault } = require('vault-nacl')
 
 const password = '$€creT'
 
-const vault = new Vault(password)
+const vault = new Vault(password, { digest: 'sha512', iterations: 20000 })
 const ciphertext = vault.encryptSync('my secret message')
 const orginal = vault.decryptSync(ciphertext)
 //> 'my secret message'
