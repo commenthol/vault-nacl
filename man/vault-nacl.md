@@ -47,6 +47,9 @@ New values attributed with `VAULT_NACL(...)VAULT_NACL` are used for later encryp
 * `--new-password-file` `<file>`:
   Action `rekey` only. Read new password from first line of file `<file>`
 
+* `-o`, `--output` `<file>`:
+  Writes decrypted output to file. Only available on `decrypt` action using one file.
+
 * `--digest` `<digest>`:
   Digest used for key derivation. One of 'sha256', 'sha384', 'sha512', 'ripemd',
   'whirlpool'.

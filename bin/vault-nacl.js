@@ -68,6 +68,10 @@ function argv () {
           throw new Error(ERROR_ITERATIONS)
         }
         break
+      case '-o':
+      case '--output':
+        cmd.output = path.resolve(process.cwd(), argv.shift())
+        break
       default:
         cmd.files.push(path.resolve(process.cwd(), arg))
         break
@@ -162,7 +166,11 @@ async function main () {
       switch (cmd.action) {
         case 'decrypt': {
           const _data = encdec.decrypt(data)
-          console.log(_data) // print decrypted data to stdout
+          if (cmd.output && cmd.files.length === 1) {
+            fs.writeFileSync(cmd.output, _data, 'utf8')
+          } else {
+            console.log(_data) // print decrypted data to stdout
+          }
           break
         }
         case 'encrypt': {
