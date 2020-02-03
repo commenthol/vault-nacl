@@ -132,7 +132,6 @@ describe('EncDecSync', function () {
     const encdec = new EncDecSync(password)
     const secret = Buffer.from('a thing is a thing is a thing is a thing').toString('base64').replace(/=/g, '')
     const encrypted = encdec.encrypt(`VAULT_NACL(${secret})VAULT_NACL`)
-    console.log(encrypted)
     const decrypted = encdec.decrypt(encrypted)
     strictEqual(decrypted, secret)
   })
