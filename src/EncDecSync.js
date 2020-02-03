@@ -1,6 +1,6 @@
 const { Vault } = require('./Vault')
 
-const RE_DECRYPT = /\bVAULT_NACL\(([A-Za-z0-9/+]{37,}={0,3})\)/g
+const RE_DECRYPT = /\bVAULT_NACL\(([A-Za-z0-9/+]{37,}={0,3})\)(?!VAULT_NACL)/g
 const RE_ENCRYPT = /\bVAULT_NACL\((.+?)\)VAULT_NACL/gm
 
 class EncDecSync {

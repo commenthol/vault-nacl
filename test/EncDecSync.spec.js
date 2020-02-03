@@ -128,6 +128,15 @@ describe('EncDecSync', function () {
     }, /^Error: Need instanceof Vault$/)
   })
 
+  it('shall en-decrypt base64 values', function () {
+    const encdec = new EncDecSync(password)
+    const secret = Buffer.from('a thing is a thing is a thing is a thing').toString('base64').replace(/=/g, '')
+    const encrypted = encdec.encrypt(`VAULT_NACL(${secret})VAULT_NACL`)
+    console.log(encrypted)
+    const decrypted = encdec.decrypt(encrypted)
+    strictEqual(decrypted, secret)
+  })
+
   describe('should re-encrypt new object value using different password', function () {
     const newPassword = 'new-password'
     let resultEnc
