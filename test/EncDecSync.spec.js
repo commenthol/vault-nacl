@@ -136,6 +136,12 @@ describe('EncDecSync', function () {
     strictEqual(decrypted, secret)
   })
 
+  it('shall check for vaults', function () {
+    const encdec = new EncDecSync(password)
+    const hasVaults = encdec.check(values())
+    assert.ok(hasVaults)
+  })
+
   describe('should re-encrypt new object value using different password', function () {
     const newPassword = 'new-password'
     let resultEnc

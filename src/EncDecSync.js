@@ -1,7 +1,9 @@
 const { Vault } = require('./Vault')
 
-const RE_DECRYPT = /\bVAULT_NACL\(([A-Za-z0-9/+]{37,}={0,3})\)(?!VAULT_NACL)/g
-const RE_ENCRYPT = /\bVAULT_NACL\((.+?)\)VAULT_NACL/gm
+const RE_DECRYPT = /\bVAULT_NACL\(([A-Za-z0-9/+\s]{37,}={0,3})\)(?!VAULT_NACL)/gm
+const RE_ENCRYPT = /\bVAULT_NACL\((.+?)\)VAULT_NACL(?!\))/gm
+
+const wrapEncrypted = str => `VAULT_NACL(${str})`
 
 class EncDecSync {
   /**
@@ -44,7 +46,14 @@ class EncDecSync {
     return this._traverse(values, { isEncMode: true, newVault })
   }
 
-  _traverse (obj, { isEncMode, newVault, visited = [] } = {}) {
+  check (values) {
+    this._hasVaults = false
+    this._keys = []
+    this._traverse(values, { isCheckMode: true })
+    return this._hasVaults
+  }
+
+  _traverse (obj, { isCheckMode, isEncMode, newVault, visited = [] } = {}) {
     const idx = visited.indexOf(obj) // circularity check
     if (idx !== -1) {
       return obj
@@ -55,7 +64,7 @@ class EncDecSync {
             if (key !== '__proto__') {
               visited.push(obj)
               this._keys.push(key)
-              obj[key] = this._traverse(obj[key], { isEncMode, newVault, visited })
+              obj[key] = this._traverse(obj[key], { isCheckMode, isEncMode, newVault, visited })
               this._keys.pop()
               visited.pop(obj)
             }
@@ -65,12 +74,16 @@ class EncDecSync {
         case '[object Array]': {
           return obj.map((item, i) => {
             this._keys.push(`[${i}]`)
-            const val = this._traverse(item, { isEncMode, newVault, visited })
+            const val = this._traverse(item, { isCheckMode, isEncMode, newVault, visited })
             this._keys.pop()
             return val
           })
         }
         case '[object String]': {
+          if (isCheckMode && (RE_DECRYPT.test(obj) || RE_ENCRYPT.test(obj))) {
+            this._hasVaults = true
+            return obj
+          }
           return isEncMode
             ? this._replaceEncMode(obj, { newVault })
             : this._replace(obj)
@@ -91,10 +104,10 @@ class EncDecSync {
         decoded[i] = newVault.encryptSync(decoded[i])
       }
       let i = 0
-      str = str.replace(RE_DECRYPT, () => `VAULT_NACL(${decoded[i++]})`)
+      str = str.replace(RE_DECRYPT, () => wrapEncrypted(decoded[i++]))
     }
     const vault = newVault || this._vault
-    return str.replace(RE_ENCRYPT, (m, enc) => `VAULT_NACL(${vault.encryptSync(enc)})`)
+    return str.replace(RE_ENCRYPT, (m, enc) => wrapEncrypted(vault.encryptSync(enc)))
   }
 
   _replace (str = '') {
