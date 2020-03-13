@@ -145,12 +145,18 @@ describe('EncDecSync', function () {
       const _values = Object.assign({
         val2: 'VAULT_NACL(value2)VAULT_NACL'
       }, values())
-      encdec = new EncDecSync(password)
+      const val1 = _values.val1
+      const other = _values.other[0]
 
+      encdec = new EncDecSync(password)
+      log(_values)
       resultEnc = encdec.rekey(_values, newPassword)
       log(resultEnc)
       // all encrypted
-      strictEqual(replacer(JSON.stringify(resultEnc)), '{"val2":"VAULT_NACL(###)","val1":"VAULT_NACL(###)","other":["unencrypted VAULT_NACL(###)"]}')
+      assert.ok(val1 !== resultEnc.val1, 'val1 shall be different')
+      assert.ok(other !== resultEnc.other[0], 'other[0] shall be different')
+      strictEqual(replacer(JSON.stringify(resultEnc)),
+        '{"val2":"VAULT_NACL(###)","val1":"VAULT_NACL(###)","other":["unencrypted VAULT_NACL(###)"]}')
     })
 
     it('shall not decrypt with old password any longer', function () {
