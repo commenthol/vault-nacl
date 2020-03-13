@@ -138,8 +138,6 @@ async function main () {
     }
     if (!cmd.newPassword && cmd.newPasswordFile) {
       cmd.newPassword = readPwdFileSync(cmd.newPasswordFile)
-      const { digest, iterations } = cmd
-      newVault = new Vault(cmd.newPassword, { digest, iterations })
     }
     const encdec = new EncDecSync(cmd.password)
 
@@ -179,6 +177,8 @@ async function main () {
           break
         }
         case 'rekey': {
+          const { digest, iterations } = cmd
+          newVault = new Vault(cmd.newPassword, { digest, iterations })
           const _data = encdec.rekey(data, newVault)
           writeFile(filename, _data)
           break
