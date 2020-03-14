@@ -1,0 +1,7 @@
+test: VAULT_NACL('encrypt this
+
+over some
+
+lines')VAULT_NACL
+
+leave unencrypted

@@ -5,10 +5,13 @@
 [![NPM version](https://badge.fury.io/js/vault-nacl.svg)](https://www.npmjs.com/package/vault-nacl/)
 [![Build Status](https://secure.travis-ci.org/commenthol/vault-nacl.svg?branch=master)](https://travis-ci.org/commenthol/vault-nacl)
 
-Allows to symmetrically encrypt dedicated values in a configuration file using
-one password.
+Allows to symmetrically encrypt dedicated values in a configuration file,
+or the complete file itself, using one password.
 
-Implements [xsalsa20-poly1305 secretbox](https://www.npmjs.com/package/tweetnacl#secret-key-authenticated-encryption-secretbox) and pbkdf2 with different digests for safe encryption.
+Implements [xsalsa20-poly1305 secretbox](https://www.npmjs.com/package/tweetnacl#secret-key-authenticated-encryption-secretbox)
+and [pbkdf2](https://tools.ietf.org/html/rfc8018) with different digests for
+safe encryption.
+
 Default is sha256 with 10000 iterations which can be changed to 'sha384',  'sha512', 'ripemd' or 'whirlpool'.  
 
 Uses `VAULT_NACL(...)` markers with Base64 encrypted secret inside the vault to

@@ -41,7 +41,7 @@ New values attributed with `VAULT_NACL(...)VAULT_NACL` are used for later encryp
 * `--password-file` `<file>`:
   Read password from first line of file `<file>`
 
-* `--new-password` `<password>`:
+* `-n`, `--new-password` `<password>`:
   Action `rekey` only. New password to encrypt the vault
 
 * `--new-password-file` `<file>`:

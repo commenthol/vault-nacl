@@ -1,3 +1,4 @@
+const fs = require('fs')
 const { strictEqual, deepStrictEqual, ...assert } = require('assert')
 const { EncDecSync, Vault } = require('..')
 const log = require('debug')('test:EncDecSync')
@@ -142,6 +143,30 @@ describe('EncDecSync', function () {
     assert.ok(hasVaults)
   })
 
+  it('shall split long lines', function () {
+    const lorem = fs.readFileSync(`${__dirname}/fixtures/lorem.txt`, 'utf8')
+    const encdec = new EncDecSync(password)
+
+    const encrypted = encdec.encryptString(lorem)
+    assert.ok(/^VAULT_NACL\(\n\w/.test(encrypted))
+
+    const decrypted = encdec.decrypt(encrypted)
+    strictEqual(decrypted, lorem)
+  })
+
+  it('shall throw if encryptString is used with an object', function () {
+    assert.throws(() => {
+      const encdec = new EncDecSync(password)
+      encdec.encryptString({ test: 1 })
+    }, /TypeError: string expected/)
+  })
+
+  it('_replaceEncMode no args', function () {
+    const encdec = new EncDecSync(password)
+    const out = encdec._replaceEncMode()
+    strictEqual(out, '')
+  })
+
   describe('should re-encrypt new object value using different password', function () {
     const newPassword = 'new-password'
     let resultEnc
@@ -163,6 +188,21 @@ describe('EncDecSync', function () {
       assert.ok(other !== resultEnc.other[0], 'other[0] shall be different')
       strictEqual(replacer(JSON.stringify(resultEnc)),
         '{"val2":"VAULT_NACL(###)","val1":"VAULT_NACL(###)","other":["unencrypted VAULT_NACL(###)"]}')
+    })
+
+    it('shall re-encrypt file with new password', function () {
+      const lorem = fs.readFileSync(`${__dirname}/fixtures/lorem.txt`, 'utf8')
+      const encdec = new EncDecSync(password)
+
+      const encrypted = encdec.encryptString(lorem)
+      log('encrypted', encrypted)
+      const rekeyed = encdec.rekey(encrypted, newPassword)
+      log('rekeyed', rekeyed)
+      assert.ok(/\s/.test(rekeyed))
+      const encdec2 = new EncDecSync(newPassword)
+      const decrypted = encdec2.decrypt(rekeyed)
+      log('decrypted', decrypted)
+      strictEqual(decrypted, lorem)
     })
 
     it('shall not decrypt with old password any longer', function () {

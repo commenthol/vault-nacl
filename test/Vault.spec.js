@@ -1,4 +1,4 @@
-const { ok, strictEqual } = require('assert')
+const { ok, strictEqual, ...assert } = require('assert')
 const { Vault } = require('..')
 const log = require('debug')('test:vault')
 
@@ -56,6 +56,13 @@ describe('vault', function () {
       .catch(err => {
         strictEqual(err.message, 'Unsupported digest')
       })
+  })
+
+  it('shall fail on unknown digest (sync mode)', function () {
+    const v = new Vault(password, { digest: 'unknown' })
+    assert.throws(() => {
+      v.encryptSync(secret)
+    }, /Unsupported digest/)
   })
 
   it('shall decrypt with sha256 digest', function () {

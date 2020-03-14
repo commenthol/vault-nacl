@@ -31,7 +31,7 @@ OPTIONS
 
        •   --password-file <file>: Read password from first line of file <file>
 
-       •   --new-password <password>: Action rekey only. New password to encrypt the vault
+       •   -n, --new-password <password>: Action rekey only. New password to encrypt the vault
 
        •   --new-password-file <file>: Action rekey only. Read new password from first line of file <file>
 
@@ -67,4 +67,4 @@ COPYRIGHT
 REPORTING BUGS
        vault-nacl repository https://github.com/commenthol/vault-nacl/issues
 
-                                                              January 2020                                                 VAULT-NACL(1)
+                                                               March 2020                                                  VAULT-NACL(1)

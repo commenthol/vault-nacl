@@ -1,9 +1,17 @@
 const { Vault } = require('./Vault')
 
-const RE_DECRYPT = /\bVAULT_NACL\(([A-Za-z0-9/+\s]{37,}={0,3})\)(?!VAULT_NACL)/gm
-const RE_ENCRYPT = /\bVAULT_NACL\((.+?)\)VAULT_NACL(?!\))/gm
+const RE_DECRYPT = /\bVAULT_NACL\(([A-Za-z0-9/+\s]{37,}[=\s]{0,5})\)(?!VAULT_NACL)/gm
+const RE_ENCRYPT = /\bVAULT_NACL\(([^]+?)\)VAULT_NACL(?!\))/gm
 
-const wrapEncrypted = str => `VAULT_NACL(${str})`
+const wrapEncrypted = (str, doSplit) => doSplit
+  ? `VAULT_NACL(\n${str}\n)`
+  : `VAULT_NACL(${str})`
+
+const splitLines = (str, doSplit) => doSplit
+  ? str.match(/[^]{1,80}/g).join('\n')
+  : str
+
+const deleteWhiteSpace = str => str.replace(/\s/g, '')
 
 class EncDecSync {
   /**
@@ -15,6 +23,8 @@ class EncDecSync {
   constructor (password, opts = {}) {
     this._vault = new Vault(password, opts)
     this._keys = []
+    this._doSplit = false
+    this._hasVaults = false
   }
 
   clear () {
@@ -22,18 +32,34 @@ class EncDecSync {
     this._vault.clear()
   }
 
+  /**
+   * @param {any} values
+   * @return {any}
+   */
   decrypt (values) {
     this._keys = []
     return this._traverse(values)
   }
 
+  /**
+   * @param {any} values
+   * @return {any}
+   */
   encrypt (values) {
     this._keys = []
     return this._traverse(values, { isEncMode: true })
   }
 
+  encryptString (str, { doSplit = true } = {}) {
+    if (typeof str !== 'string') throw new TypeError('string expected')
+    this._doSplit = !!doSplit
+    return this.encrypt(`VAULT_NACL(${str})VAULT_NACL`)
+  }
+
   /**
+   * @param {any} values
    * @param {Vault|String} [newVault] - new password/vault for re-encryption
+   * @return {any}
    */
   rekey (values, newVault) {
     this._keys = []
@@ -46,6 +72,10 @@ class EncDecSync {
     return this._traverse(values, { isEncMode: true, newVault })
   }
 
+  /**
+   * @param {any} values
+   * @return {boolean}
+   */
   check (values) {
     this._hasVaults = false
     this._keys = []
@@ -61,6 +91,7 @@ class EncDecSync {
       switch (toString.call(obj)) {
         case '[object Object]': {
           Object.keys(obj).forEach((key) => {
+            // istanbul ignore next
             if (key !== '__proto__') {
               visited.push(obj)
               this._keys.push(key)
@@ -97,22 +128,34 @@ class EncDecSync {
 
   _replaceEncMode (str = '', { newVault } = {}) {
     const decoded = []
-    str.replace(RE_DECRYPT, (m, enc) => decoded.push(this._vault.decryptSync(enc)))
+    let doSplit = this._doSplit
+
+    str.replace(RE_DECRYPT, (m, enc) => {
+      if (/\s/.test(enc)) doSplit = true
+      decoded.push(this._vault.decryptSync(deleteWhiteSpace(enc)))
+    })
 
     if (newVault) { // re-encrypt
       for (let i = 0; i < decoded.length; i++) {
         decoded[i] = newVault.encryptSync(decoded[i])
       }
       let i = 0
-      str = str.replace(RE_DECRYPT, () => wrapEncrypted(decoded[i++]))
+      str = str.replace(RE_DECRYPT, () => wrapEncrypted(
+        splitLines(decoded[i++], doSplit),
+        doSplit
+      ))
     }
+
     const vault = newVault || this._vault
-    return str.replace(RE_ENCRYPT, (m, enc) => wrapEncrypted(vault.encryptSync(enc)))
+    return str.replace(RE_ENCRYPT, (m, enc) => wrapEncrypted(
+      splitLines(vault.encryptSync(enc), doSplit),
+      doSplit
+    ))
   }
 
-  _replace (str = '') {
+  _replace (str) {
     try {
-      return str.replace(RE_DECRYPT, (m, enc) => this._vault.decryptSync(enc))
+      return str.replace(RE_DECRYPT, (m, enc) => this._vault.decryptSync(deleteWhiteSpace(enc)))
     } catch (e) {
       if (e.message === 'Decrypt failed' && this._keys.length) {
         throw new Error(`Decrypt failed at "${this._keys.join('.')}"`)
@@ -124,5 +167,6 @@ class EncDecSync {
 }
 
 module.exports = {
-  EncDecSync
+  EncDecSync,
+  splitLines
 }

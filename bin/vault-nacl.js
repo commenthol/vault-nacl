@@ -50,6 +50,7 @@ function argv () {
       case '--password':
         cmd.password = argv.shift()
         break
+      case '-n':
       case '--new-password':
         cmd.newPassword = argv.shift()
         break
@@ -139,12 +140,13 @@ async function main () {
     if (!cmd.newPassword && cmd.newPasswordFile) {
       cmd.newPassword = readPwdFileSync(cmd.newPasswordFile)
     }
-    const encdec = new EncDecSync(cmd.password)
+    const { digest, iterations } = cmd
+    const encdec = new EncDecSync(cmd.password, { digest, iterations })
 
     if (!cmd.files.length) {
       if (cmd.action === 'encrypt') {
         const data = await promtPassword('Secret')
-        const _data = encdec.encrypt(`VAULT_NACL(${data})VAULT_NACL`)
+        const _data = encdec.encryptString(data)
         console.log(_data)
         return
       } else if (cmd.action === 'decrypt') {
@@ -172,15 +174,17 @@ async function main () {
           break
         }
         case 'encrypt': {
-          const _data = encdec.encrypt(data)
-          writeFile(filename, _data)
+          const _data = encdec.check(data)
+            ? encdec.encrypt(data)
+            : encdec.encryptString(data)
+          writeFile(cmd.output || filename, _data)
           break
         }
         case 'rekey': {
           const { digest, iterations } = cmd
           newVault = new Vault(cmd.newPassword, { digest, iterations })
           const _data = encdec.rekey(data, newVault)
-          writeFile(filename, _data)
+          writeFile(cmd.output || filename, _data)
           break
         }
       }
