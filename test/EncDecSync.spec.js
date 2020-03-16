@@ -167,6 +167,20 @@ describe('EncDecSync', function () {
     strictEqual(out, '')
   })
 
+  it('shall encrypt new value', function () {
+    const values = [
+      'VAULT_NACL(AQAQJwAAVtajI7Ms2OChOs+ijD7yeuRQxbtfUnmSweH1kh1yQuBwtY2OSTLHMzlZFZfl7bM0C3A/FgzsSX3GPFMB)',
+      'VAULT_NACL(new value)VAULT_NACL',
+      'test',
+      'VAULT_NACL(AQAQJwAAVtajI7Ms2OChOs+ijD7yeuRQxbtfUnmSweH1kh1yQuBwtY2OSTLHMzlZFZfl7bM0C3A/FgzsSX3GPFMB)'
+    ].join('\n')
+    const encdec = new EncDecSync(password)
+    const out = encdec.encrypt(values)
+    log(out)
+    const res = out.match(/VAULT_NACL/g)
+    strictEqual(res.length, 3)
+  })
+
   describe('should re-encrypt new object value using different password', function () {
     const newPassword = 'new-password'
     let resultEnc

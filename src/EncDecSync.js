@@ -1,7 +1,7 @@
 const { Vault } = require('./Vault')
 
 const RE_DECRYPT = /\bVAULT_NACL\(([A-Za-z0-9/+\s]{37,}[=\s]{0,5})\)(?!VAULT_NACL)/gm
-const RE_ENCRYPT = /\bVAULT_NACL\(([^]+?)\)VAULT_NACL(?!\))/gm
+const RE_ENCRYPT = /\bVAULT_NACL\(([^)]+?)\)VAULT_NACL(?!\))/gm
 
 const wrapEncrypted = (str, doSplit) => doSplit
   ? `VAULT_NACL(\n${str}\n)`
