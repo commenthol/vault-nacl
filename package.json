@@ -1,6 +1,6 @@
 {
   "name": "vault-nacl",
-  "version": "0.5.1",
+  "version": "0.5.2",
   "description": "A symmetric encrypted vault using nacl elliptic curves",
   "keywords": [
     "cipher",
