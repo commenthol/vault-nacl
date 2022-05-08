@@ -1,6 +1,6 @@
 const { promisify } = require('util')
 const crypto = require('crypto')
-const nacl = require('tweetnacl')
+const nacl = require('tweetnacl/nacl-fast')
 
 const pbkdf2 = promisify(crypto.pbkdf2)
 
@@ -29,21 +29,29 @@ const bufferToNum = (buf) => buf.readUInt32LE()
 class Vault {
   constructor (password, {
     digest = 'sha256',
-    iterations = 10000,
+    iterations,
     inputEncoding = 'utf8',
     outputEncoding = 'base64'
   } = {}) {
+    // https://cheatsheetseries.owasp.org/cheatsheets/Password_Storage_Cheat_Sheet.html
+    if (!iterations) {
+      iterations = digest === 'sha512'
+        ? 120000
+        : 310000
+    }
+
     Object.assign(this, {
       digest,
       iterations,
       inputEncoding,
       outputEncoding
     })
-    this[PASSWORD] = password
+
+    Object.defineProperty(this, PASSWORD, { value: password, writable: true })
   }
 
   clear () {
-    this[PASSWORD] = ''
+    Object.defineProperty(this, PASSWORD, { value: undefined })
   }
 
   _derivedKeySync ({ salt, iterations, digest }) {

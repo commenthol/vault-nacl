@@ -13,7 +13,7 @@ Implements [xsalsa20-poly1305 secretbox](https://www.npmjs.com/package/tweetnacl
 and [pbkdf2](https://tools.ietf.org/html/rfc8018) with different digests for
 safe encryption.
 
-Default is sha256 with 10000 iterations which can be changed to 'sha384', 'sha512'.
+Default is sha256 (310000 iterations) which can be changed to 'sha384' or 'sha512' (120000 iterations).
 
 Uses `VAULT_NACL(...)` markers with Base64 encrypted secret inside the vault to
 identify encrypted values for decryption.
