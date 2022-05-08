@@ -27,25 +27,30 @@ const numToBuffer = (number) => {
 const bufferToNum = (buf) => buf.readUInt32LE()
 
 class Vault {
-  constructor (password, {
-    digest = 'sha256',
-    iterations,
-    inputEncoding = 'utf8',
-    outputEncoding = 'base64'
-  } = {}) {
-    // https://cheatsheetseries.owasp.org/cheatsheets/Password_Storage_Cheat_Sheet.html
-    if (!iterations) {
-      iterations = digest === 'sha512'
-        ? 120000
-        : 310000
-    }
-
-    Object.assign(this, {
-      digest,
+  /**
+   * @param {string} password
+   * @param {object} opts
+   * @param {string} [opts.digest='sha256']
+   * @param {number} [opts.iterations=310000]
+   * @param {BufferEncoding} [opts.inputEncoding='utf8']
+   * @param {BufferEncoding} [opts.outputEncoding='base64']
+   */
+  constructor (password, opts = {}) {
+    const {
+      digest = 'sha256',
       iterations,
-      inputEncoding,
-      outputEncoding
-    })
+      inputEncoding = 'utf8',
+      outputEncoding = 'base64'
+    } = opts
+
+    // https://cheatsheetseries.owasp.org/cheatsheets/Password_Storage_Cheat_Sheet.html
+    this.iterations = iterations ?? digest === 'sha512'
+      ? 120000
+      : 310000
+
+    this.digest = digest
+    this.inputEncoding = inputEncoding
+    this.outputEncoding = outputEncoding
 
     Object.defineProperty(this, PASSWORD, { value: password, writable: true })
   }
@@ -142,6 +147,11 @@ class Vault {
 
 module.exports = { Vault }
 
+/**
+ * @private
+ * @param {Buffer} derivedKey
+ * @returns {{nonce: Buffer, key: Buffer}}
+ */
 const nonceKey = (derivedKey) => {
   let tmp = 0
   const nonce = derivedKey.slice(tmp, tmp += NONCE_LEN)

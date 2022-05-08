@@ -1,0 +1,28 @@
+{
+  "compilerOptions": {
+    "allowJs": true,
+    "allowSyntheticDefaultImports": true,
+    "checkJs": true,
+    "declaration": true,
+    "declarationDir": "types",
+    "moduleResolution": "node",
+    "noImplicitAny": false,
+    "strict": true,
+    "target": "es2021"
+  },
+  "include": [
+    "**/*.js"
+  ],
+  "exclude": [
+    "bin",
+    "coverage",
+    "dist",
+    "docs",
+    "examples",
+    "lib",
+    "node_modules",
+    "test",
+    "tmp",
+    "rollup.conf.js"
+  ]
+}

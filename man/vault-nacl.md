@@ -56,7 +56,7 @@ New values attributed with `VAULT_NACL(...)VAULT_NACL` are used for later encryp
   'sha256' is default.
 
 * `--iterations` `<number>`
-  Iterations used for key derivation. Default is '10000'.
+  Iterations used for key derivation. Default is '310000'.
 
 ## EXAMPLES
 

@@ -1,24 +1,17 @@
 const { Vault } = require('./Vault')
+const { deleteWhiteSpace, splitLines, wrapEncrypted } = require('./utils.js')
 
 const RE_DECRYPT = /\bVAULT_NACL\(([A-Za-z0-9/+\s]{37,}[=\s]{0,5})\)(?!VAULT_NACL)/m
 const RE_ENCRYPT = /\bVAULT_NACL\(([^)]+?)\)VAULT_NACL(?!\))/m
 
-const wrapEncrypted = (str, doSplit) => doSplit
-  ? `VAULT_NACL(\n${str}\n)`
-  : `VAULT_NACL(${str})`
-
-const splitLines = (str, doSplit) => doSplit
-  ? str.match(/[^]{1,80}/g).join('\n')
-  : str
-
-const deleteWhiteSpace = str => str.replace(/\s/g, '')
-
 class EncDec {
   /**
-   * @param {string} [digest='sha256']
-   * @param {number} [iterations=10000]
-   * @param {string} [inputEncoding='utf8']
-   * @param {string} [outputEncoding='base64']
+   * @param {string} password
+   * @param {object} opts
+   * @param {string} [opts.digest='sha256']
+   * @param {number} [opts.iterations=310000]
+   * @param {BufferEncoding} [opts.inputEncoding='utf8']
+   * @param {BufferEncoding} [opts.outputEncoding='base64']
    */
   constructor (password, opts = {}) {
     this._vault = new Vault(password, opts)
@@ -52,7 +45,7 @@ class EncDec {
 
   /**
    * @param {string} str
-   * @return {Promise<any>}
+   * @return {Promise<string>}
    */
   encryptString (str, { doSplit = true } = {}) {
     if (typeof str !== 'string') throw new TypeError('string expected')
@@ -78,7 +71,7 @@ class EncDec {
 
   /**
    * @param {any} values
-   * @return {boolean}
+   * @return {Promise<boolean>}
    */
   async check (values) {
     this._hasVaults = false
@@ -87,6 +80,16 @@ class EncDec {
     return this._hasVaults
   }
 
+  /**
+   * @private
+   * @param {any} obj
+   * @param {object} [param1]
+   * @param {boolean} [param1.isCheckMode]
+   * @param {boolean} [param1.isEncMode]
+   * @param {Vault} [param1.newVault]
+   * @param {any} [param1.visited]
+   * @returns {Promise<any>}
+   */
   async _traverse (obj, { isCheckMode, isEncMode, newVault, visited = [] } = {}) {
     const idx = visited.indexOf(obj) // circularity check
     if (idx !== -1) {
@@ -132,6 +135,13 @@ class EncDec {
     }
   }
 
+  /**
+   * @private
+   * @param {string} str
+   * @param {object} [param1 ]
+   * @param {Vault} [param1.newVault]
+   * @returns {Promise<string>}
+   */
   async _replaceEncMode (str = '', { newVault } = {}) {
     const decoded = []
     let doSplit = this._doSplit
@@ -162,11 +172,11 @@ class EncDec {
   _replace (str) {
     try {
       return replace(RE_DECRYPT, str, (enc) => this._vault.decrypt(deleteWhiteSpace(enc)))
-    } catch (e) {
-      if (e.message === 'Decrypt failed' && this._keys.length) {
+    } catch (/** @type {any} */err) {
+      if (err.message === 'Decrypt failed' && this._keys.length) {
         throw new Error(`Decrypt failed at "${this._keys.join('.')}"`)
       } else {
-        throw e
+        throw err
       }
     }
   }
@@ -189,6 +199,5 @@ async function replace (regex, str = '', fn) {
 }
 
 module.exports = {
-  EncDec,
-  splitLines
+  EncDec
 }

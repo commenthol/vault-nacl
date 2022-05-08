@@ -9,18 +9,22 @@
 Allows to symmetrically encrypt dedicated values in a configuration file,
 or the complete file itself, using one password.
 
-Implements [xsalsa20-poly1305 secretbox](https://www.npmjs.com/package/tweetnacl#secret-key-authenticated-encryption-secretbox)
-and [pbkdf2](https://tools.ietf.org/html/rfc8018) with different digests for
-safe encryption.
+Implements [xsalsa20-poly1305 secretbox][] and [pbkdf2][] with different digests
+for safe encryption.
 
-Default is sha256 (310000 iterations) which can be changed to 'sha384' or 'sha512' (120000 iterations).
+Default is sha256 (310000 iterations) which can be changed to 'sha384', 'sha512'
+(120000 iterations).
 
 Uses `VAULT_NACL(...)` markers with Base64 encrypted secret inside the vault to
 identify encrypted values for decryption.
 
-New values attributed with `VAULT_NACL(...)VAULT_NACL` are used for later encryption.
+New values attributed with `VAULT_NACL(...)VAULT_NACL` are used for later
+encryption.
 
 Choose the CLI or API to fit your usecase.
+
+[xsalsa20-poly1305 secretbox]: https://www.npmjs.com/package/tweetnacl#secret-key-authenticated-encryption-secretbox
+[pbkdf2]: https://tools.ietf.org/html/rfc8018
 
 ## toc
 
@@ -87,15 +91,37 @@ $ vault-nacl decrypt config.json
 
 See `vault-nacl --help` for complete list of options.
 
+Or take a look at the [man-page][].
+
+[man-page]: https://github.com/commenthol/vault-nacl/blob/master/man/vault-nacl.md
+
 ## api
 
 ### enc-decrypt
 
-`EncDecSync` handles `VAULT_NACL(...)` encoded strings in strings or objects.
+_asynchronous_
+
+`EncDec` handles `VAULT_NACL(...)` encoded strings in strings or objects.
+
+```js
+const { EncDec } = require('vault-nacl')
+const password = '$€creT'
+const secret = { mySecret: `VAULT_NACL(a $€Cr3T secret)VAULT_NACL` }
+
+const encdec = new EncDec(password)
+const result = await encdec.encrypt(secret)
+//>  { mySecret: 'VAULT_NACL(AQAQJwAA+CWBR7...+qAo=)' }
+
+await encdec.decrypt(result)
+//> { mySecret: 'a $€Cr3T secret' }
+```
+
+_synchronous_
+
+`EncDecSync` handles `VAULT_NACL(...)` encoded strings in strings or objects
+synchronously.
 
 > NOTE: This function is blocking.
-
-_encrypt_
 
 ```js
 const { EncDecSync } = require('vault-nacl')
@@ -162,7 +188,7 @@ Format of the base64 encrypted secret:
 
 - digest: digest index. See src/Vault.js DIGESTS
   0='sha256', 1='sha384', 2='sha512', 3='ripemd', 4='whirlpool'
-- iterations: Number of iterations. Default 10000
+- iterations: Number of iterations. Default 310000
 - salt: Used salt for key derivation
 
 ## license

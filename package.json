@@ -1,6 +1,6 @@
 {
   "name": "vault-nacl",
-  "version": "0.7.0-1",
+  "version": "1.0.0-0",
   "description": "A symmetric encrypted vault using nacl elliptic curves",
   "keywords": [
     "cipher",
@@ -20,6 +20,7 @@
   "license": "MIT",
   "author": "commenthol",
   "main": "src",
+  "types": "types",
   "bin": {
     "vault-nacl": "bin/vault-nacl.js"
   },
@@ -32,24 +33,27 @@
   },
   "files": [
     "bin",
+    "man",
     "src",
-    "man"
+    "types"
   ],
   "scripts": {
-    "all": "npm run test && npm run lint && npm run clean",
-    "clean": "rimraf test/fixtures/*.vault coverage .nyc_output",
+    "all": "npm run test && npm run lint && npm run types && npm run clean",
+    "clean": "rimraf test/fixtures/*.vault coverage",
     "lint": "eslint --fix src test",
     "man": "cd man && ronn --build --roff vault-nacl.md && mv vault-nacl.roff vault-nacl.1 && man ./vault-nacl.1 > vault-nacl.txt",
     "prepublishOnly": "npm run all",
     "readme": "markedpp --github -i README.md -o README.md",
     "test": "c8 -r text mocha",
-    "test:mocha": "mocha"
+    "test:mocha": "mocha",
+    "types": "rm -r types; tsc --emitDeclarationOnly true --noEmitOnError"
   },
   "dependencies": {
     "enquirer": "^2.3.6",
     "tweetnacl": "^1.0.3"
   },
   "devDependencies": {
+    "@types/node": "^16",
     "debug": "^4.3.4",
     "eslint": "^8.15.0",
     "eslint-config-standard": "^17.0.0",
@@ -58,7 +62,8 @@
     "eslint-plugin-promise": "^6.0.0",
     "mocha": "^10.0.0",
     "c8": "^7.11.2",
-    "rimraf": "^3.0.2"
+    "rimraf": "^3.0.2",
+    "typescript": "^4.6.3"
   },
   "engine": {
     "node": ">=12.0.0"

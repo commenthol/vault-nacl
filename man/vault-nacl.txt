@@ -40,7 +40,7 @@ OPTIONS
        •   --digest  <digest>:  Digest used for key derivation. One of ´sha256´, ´sha384´, ´sha512´, ´ripemd´, ´whirlpool´.  ´sha256´ is
            default.
 
-       •   --iterations <number> Iterations used for key derivation. Default is ´10000´.
+       •   --iterations <number> Iterations used for key derivation. Default is ´310000´.
 
 EXAMPLES
        Encrypt vaultfile ´config.json´ (You´ll get prompted for the password):
