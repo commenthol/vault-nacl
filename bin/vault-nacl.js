@@ -64,7 +64,7 @@ function argv () {
         break
       case '--iterations':
         cmd.iterations = Number(argv.shift())
-        if (!isNaN(cmd.iterations)) {
+        if (isNaN(cmd.iterations)) {
           throw new Error(ERROR_ITERATIONS)
         }
         break

@@ -57,14 +57,10 @@ class Vault {
   _derivedKeySync ({ salt, iterations, digest }) {
     if (!this[PASSWORD]) throw new Error('No password')
     if (!DIGESTS.includes(digest)) throw new Error('Unsupported digest')
+
     const derivedKey = crypto.pbkdf2Sync(this[PASSWORD], salt, iterations, NONCE_LEN + KEY_LEN, digest)
-    let tmp = 0
-    const nonce = derivedKey.slice(tmp, tmp += NONCE_LEN)
-    const key = derivedKey.slice(tmp, tmp += KEY_LEN)
-    return {
-      nonce,
-      key
-    }
+
+    return nonceKey(derivedKey)
   }
 
   _joinV1 ({ salt, digest, iterations, box }) {
@@ -122,14 +118,10 @@ class Vault {
   async _derivedKey ({ salt, iterations, digest }) {
     if (!this[PASSWORD]) throw new Error('No password')
     if (!DIGESTS.includes(digest)) throw new Error('Unsupported digest')
+
     const derivedKey = await pbkdf2(this[PASSWORD], salt, iterations, NONCE_LEN + KEY_LEN, digest)
-    let tmp = 0
-    const nonce = derivedKey.slice(tmp, tmp += NONCE_LEN)
-    const key = derivedKey.slice(tmp, tmp += KEY_LEN)
-    return {
-      nonce,
-      key
-    }
+
+    return nonceKey(derivedKey)
   }
 
   async encrypt (message) {
@@ -149,3 +141,13 @@ class Vault {
 }
 
 module.exports = { Vault }
+
+const nonceKey = (derivedKey) => {
+  let tmp = 0
+  const nonce = derivedKey.slice(tmp, tmp += NONCE_LEN)
+  const key = derivedKey.slice(tmp, tmp += KEY_LEN)
+  return {
+    nonce,
+    key
+  }
+}
