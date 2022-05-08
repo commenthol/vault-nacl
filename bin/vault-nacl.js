@@ -4,7 +4,6 @@
 
 const fs = require('fs')
 const path = require('path')
-const chalk = require('chalk')
 const { prompt } = require('enquirer')
 const { EncDecSync, Vault, readPwdFileSync } = require('..')
 
@@ -125,9 +124,6 @@ async function main () {
     version()
   } else if (!cmd.action) {
     throw new Error(ERROR_COMMAND)
-  // } else if (!cmd.files.length) {
-  //   console.error(chalk.red(ERROR_FILENAME))
-  //   process.exit(2)
   } else {
     await ask(cmd)
 
@@ -193,6 +189,6 @@ async function main () {
 }
 
 main().catch(err => {
-  console.error(chalk.red('Error: ' + err.message))
+  console.error('Error: ' + err.message)
   process.exit(1)
 })

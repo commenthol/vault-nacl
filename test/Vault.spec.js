@@ -2,6 +2,10 @@ const { ok, strictEqual, ...assert } = require('assert')
 const { Vault } = require('..')
 const log = require('debug')('test:vault')
 
+const nodeVersion = process.version.match(/(\d+)/g).map(n => parseInt(n))
+
+const itcond = cond => cond ? it.skip : it
+
 describe('vault', function () {
   const vaultSha256 = 'AQAQJwAAhDU2gJ4yAz/PKXJLDyVT2kohFeI0sKZaWPWaeTUUIDZJmn8ScyayjzDcp4qf6D8GFNhaND1zCa65pdG8Om4o'
   const vaultSha384 = 'AQEQJwAAY6h4r75uWoxc8MFbdmQNJhunb2XxjJw3fPDlV5qWCiGxA0t+nR+sxzufK5+xX5miiTVUM/ehvz6lUqmHM++r'
@@ -95,7 +99,8 @@ describe('vault', function () {
       })
   })
 
-  it('shall decrypt with ripemd digest', function () {
+  // openssl in node@17 has dropped support for ripemd
+  itcond(nodeVersion[0] > 16)('shall decrypt with ripemd digest', function () {
     const v = new Vault(password)
     return v.decrypt(vaultRipemd)
       .then(_secret => {
@@ -103,7 +108,8 @@ describe('vault', function () {
       })
   })
 
-  it('shall decrypt with whirlpool digest', function () {
+  // openssl in node@17 has dropped support for whirlpool
+  itcond(nodeVersion[0] > 16)('shall decrypt with whirlpool digest', function () {
     const v = new Vault(password)
     return v.decrypt(vaultWhirl)
       .then(_secret => {
@@ -123,7 +129,7 @@ describe('vault', function () {
       })
   })
 
-  ;['sha256', 'sha384', 'sha512', 'ripemd', 'whirlpool'].forEach(digest => {
+  ;['sha256', 'sha384', 'sha512'].forEach(digest => {
     it('shall encrypt and decrypt with ' + digest, function () {
       const v = new Vault(password, { digest })
       return v.encrypt(secret)
@@ -137,8 +143,31 @@ describe('vault', function () {
     })
   })
 
-  ;['sha256', 'sha384', 'sha512', 'ripemd', 'whirlpool'].forEach(digest => {
+  ;['ripemd', 'whirlpool'].forEach(digest => {
+    itcond(nodeVersion[0] > 16)('shall encrypt and decrypt with ' + digest, function () {
+      const v = new Vault(password, { digest })
+      return v.encrypt(secret)
+        .then(_vault => {
+          log(_vault)
+          return v.decrypt(_vault)
+        })
+        .then(_secret => {
+          strictEqual(_secret, secret)
+        })
+    })
+  })
+
+  ;['sha256', 'sha384', 'sha512'].forEach(digest => {
     it('shall encrypt and decrypt with ' + digest + ' sync', function () {
+      const v = new Vault(password, { digest })
+      const _vault = v.encryptSync(secret)
+      const _secret = v.decryptSync(_vault)
+      strictEqual(_secret, secret)
+    })
+  })
+
+  ;['ripemd', 'whirlpool'].forEach(digest => {
+    itcond(nodeVersion[0] > 16)('shall encrypt and decrypt with ' + digest + ' sync', function () {
       const v = new Vault(password, { digest })
       const _vault = v.encryptSync(secret)
       const _secret = v.decryptSync(_vault)
@@ -186,7 +215,11 @@ describe('vault', function () {
         ok(false, 'shall not reach here')
       })
       .catch(err => {
-        strictEqual(err.message, 'Decrypt failed')
+        if (nodeVersion[0] >= 17) {
+          strictEqual(err.message, 'error:0308010C:digital envelope routines::unsupported')
+        } else {
+          strictEqual(err.message, 'Decrypt failed')
+        }
       })
   })
 

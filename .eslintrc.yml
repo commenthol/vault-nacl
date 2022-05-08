@@ -1,12 +1,11 @@
 env:
-  commonjs: true
-  es6: true
+  es2021: true
   node: true
   mocha: true
-extends: standard
-globals:
-  Atomics: readonly
-  SharedArrayBuffer: readonly
+extends:
+  - standard
 parserOptions:
-  ecmaVersion: 2018
-rules: {}
+  ecmaVersion: latest
+  sourceType: module
+rules:
+  n/no-path-concat: off

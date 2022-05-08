@@ -30,6 +30,11 @@
     "man": "man",
     "test": "test"
   },
+  "files": [
+    "bin",
+    "src",
+    "man"
+  ],
   "scripts": {
     "all": "npm run test && npm run lint && npm run clean",
     "clean": "rimraf test/fixtures/*.vault coverage .nyc_output",
@@ -37,28 +42,25 @@
     "man": "cd man && ronn --build --roff vault-nacl.md && mv vault-nacl.roff vault-nacl.1 && man ./vault-nacl.1 > vault-nacl.txt",
     "prepublishOnly": "npm run all",
     "readme": "markedpp --github -i README.md -o README.md",
-    "test": "nyc -r text mocha",
+    "test": "c8 -r text mocha",
     "test:mocha": "mocha"
   },
   "dependencies": {
-    "chalk": "^4.0.0",
-    "enquirer": "^2.3.5",
+    "enquirer": "^2.3.6",
     "tweetnacl": "^1.0.3"
   },
   "devDependencies": {
-    "debug": "^4.1.1",
-    "eslint": "^6.8.0",
-    "eslint-config-standard": "^14.1.1",
-    "eslint-plugin-import": "^2.20.2",
-    "eslint-plugin-node": "^11.1.0",
-    "eslint-plugin-promise": "^4.2.1",
-    "eslint-plugin-standard": "^4.0.1",
-    "mocha": "^7.1.1",
-    "nyc": "^15.0.1",
-    "rimraf": "^3.0.2",
-    "ronn": "^0.4.0"
+    "debug": "^4.3.4",
+    "eslint": "^8.15.0",
+    "eslint-config-standard": "^17.0.0",
+    "eslint-plugin-import": "^2.26.0",
+    "eslint-plugin-n": "^15.2.0",
+    "eslint-plugin-promise": "^6.0.0",
+    "mocha": "^10.0.0",
+    "c8": "^7.11.2",
+    "rimraf": "^3.0.2"
   },
   "engine": {
-    "node": ">=8.0.0"
+    "node": ">=12.0.0"
   }
 }
